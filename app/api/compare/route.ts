@@ -8,6 +8,8 @@ const ROOT_DIR = path.resolve(process.cwd(), "..");
 const CHAT_MODEL = process.env.CHAT_MODEL || process.env.GROQ_MODEL || "openai/gpt-oss-120b";
 const COSAVU_URL = (process.env.CONTEXTAPI_URL || "https://api.cosavu.com").replace(/\/$/, "");
 const COSAVU_ORIGIN = process.env.CONTEXTAPI_ORIGIN || "https://cosavu.com";
+const CHAT_INPUT_PRICE_PER_M = Number(process.env.CHAT_INPUT_PRICE_PER_M ?? "0.15");
+const CHAT_OUTPUT_PRICE_PER_M = Number(process.env.CHAT_OUTPUT_PRICE_PER_M ?? "0.75");
 
 type ChatPayload = {
   model: string;
@@ -186,8 +188,15 @@ function formatChatResult(json: any, requestPayload: ChatPayload) {
       totalTokens,
       reasoningTokens,
     },
+    costUsd: computeCost(baseInput, outputTokens),
     latencyMs: json._latency_ms,
   };
+}
+
+function computeCost(inputTokens: number | null, outputTokens: number | null) {
+  const input = (inputTokens ?? 0) * (CHAT_INPUT_PRICE_PER_M / 1_000_000);
+  const output = (outputTokens ?? 0) * (CHAT_OUTPUT_PRICE_PER_M / 1_000_000);
+  return input + output;
 }
 
 function extractThinking(json: any) {

@@ -34,6 +34,19 @@ export default function Home() {
     };
   }, [result]);
 
+  const costSavings = useMemo(() => {
+    if (!result) return null;
+    const direct = result.raw.costUsd;
+    const optimized = result.optimized.costUsd;
+    const saved = direct - optimized;
+    return {
+      direct,
+      optimized,
+      saved,
+      pct: direct ? (saved / direct) * 100 : 0,
+    };
+  }, [result]);
+
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (!prompt.trim()) return;
@@ -164,6 +177,17 @@ export default function Home() {
             {" "}(<strong className="text-foreground">{savings.pct.toFixed(1)}%</strong> based on ContextAPI estimates).
           </div>
         ) : null}
+
+        {costSavings ? (
+          <div className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">
+            Direct cost <strong className="text-foreground">{formatUsd(costSavings.direct)}</strong>
+            {" · "}Optimized cost <strong className="text-foreground">{formatUsd(costSavings.optimized)}</strong>
+            {" · "}
+            {costSavings.saved >= 0 ? "Saved" : "Extra"}{" "}
+            <strong className="text-foreground">{formatUsd(Math.abs(costSavings.saved))}</strong>
+            {" "}(<strong className="text-foreground">{costSavings.pct.toFixed(1)}%</strong>).
+          </div>
+        ) : null}
       </div>
     </main>
   );
@@ -225,6 +249,7 @@ function MetricTable({ result, cosavu }: { result?: CompareResult["raw"]; cosavu
     ["Chat output (incl. reasoning)", tokenText(result?.usage.outputTokens)],
     ["Chat reasoning", tokenText(result?.usage.reasoningTokens)],
     ["Chat total", tokenText(result?.usage.totalTokens)],
+    ["Chat cost", result ? formatUsd(result.costUsd) : "-"],
     ["Chat latency", result ? `${Math.round(result.latencyMs)} ms` : "-"],
     ["temperature", result?.request.temperature ?? "-"],
     ["top_p", result?.request.top_p ?? "-"],
@@ -245,4 +270,10 @@ function MetricTable({ result, cosavu }: { result?: CompareResult["raw"]; cosavu
 
 function tokenText(value?: number | null) {
   return value === null || value === undefined ? "-" : `${value} tokens`;
+}
+
+function formatUsd(value: number) {
+  if (!Number.isFinite(value) || value === 0) return "$0.000000";
+  if (value < 0.01) return `$${value.toFixed(6)}`;
+  return `$${value.toFixed(4)}`;
 }

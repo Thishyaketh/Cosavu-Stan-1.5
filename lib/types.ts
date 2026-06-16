@@ -14,6 +14,7 @@ export type ChatResult = {
     totalTokens: number | null;
     reasoningTokens: number;
   };
+  costUsd: number;
   latencyMs: number;
 };
 

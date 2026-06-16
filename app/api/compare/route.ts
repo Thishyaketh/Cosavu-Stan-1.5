@@ -160,6 +160,16 @@ async function postChat(payload: ChatPayload) {
 function formatChatResult(json: any, requestPayload: ChatPayload) {
   const usage = json.usage || json.x_groq?.usage || {};
   const actualPayload = json._request_payload || requestPayload;
+  const reasoningTokens =
+    usage.completion_tokens_details?.reasoning_tokens ??
+    usage.reasoning_tokens ??
+    0;
+  const baseCompletion = usage.completion_tokens ?? usage.output_tokens ?? null;
+  const baseInput = usage.prompt_tokens ?? usage.input_tokens ?? null;
+  const baseTotal = usage.total_tokens ?? null;
+  const outputTokens = baseCompletion === null ? null : baseCompletion + reasoningTokens;
+  const totalTokens =
+    baseTotal === null ? null : baseTotal + reasoningTokens;
   return {
     answer: json.choices?.[0]?.message?.content || "",
     thinking: extractThinking(json),
@@ -171,9 +181,10 @@ function formatChatResult(json: any, requestPayload: ChatPayload) {
       max_completion_tokens: actualPayload.max_completion_tokens || null,
     },
     usage: {
-      inputTokens: usage.prompt_tokens ?? usage.input_tokens ?? null,
-      outputTokens: usage.completion_tokens ?? usage.output_tokens ?? null,
-      totalTokens: usage.total_tokens ?? null,
+      inputTokens: baseInput,
+      outputTokens,
+      totalTokens,
+      reasoningTokens,
     },
     latencyMs: json._latency_ms,
   };

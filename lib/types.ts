@@ -12,6 +12,7 @@ export type ChatResult = {
     inputTokens: number | null;
     outputTokens: number | null;
     totalTokens: number | null;
+    reasoningTokens: number;
   };
   latencyMs: number;
 };

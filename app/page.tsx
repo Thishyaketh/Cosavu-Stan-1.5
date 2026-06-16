@@ -5,9 +5,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { ArrowRight, BadgeCheck, Brain, Loader2, Sparkles, Table2 } from "lucide-react";
 import type { CompareResult } from "@/lib/types";
-
-const defaultPrompt =
-  "Hey there! So, um, I was kind of hoping that maybe, if it's not too much trouble and if you have a moment, you could possibly help me out with something I've been thinking about for quite a while now. Basically, what I'm really trying to do, at the end of the day, is to sort of understand — like, in a really thorough and detailed and comprehensive way — how I would go about designing and architecting and ultimately building out a production-grade, enterprise-ready, highly scalable retrieval-augmented generation system, you know, the kind of thing that big companies actually use in the real world. I would really, really appreciate it if you could walk me through, step by step, in a very careful and methodical and well-organized manner, all of the various different architectural decisions and considerations and tradeoffs that I would need to think about and carefully weigh, including but not limited to things like how to do chunking properly, how to pick the right embedding model for my particular use case, and how to balance and reason about the various tradeoffs between latency, recall, accuracy, and overall cost. Please feel free to assume that I already know the basics and the fundamentals, so you don't need to over-explain the super beginner stuff. Thank you so, so, so much in advance — I genuinely really appreciate your time and help with this!";
+import { defaultPrompt } from "@/lib/default-prompt";
 
 const tiers = [
   "stan-1.5-mini-predictive",

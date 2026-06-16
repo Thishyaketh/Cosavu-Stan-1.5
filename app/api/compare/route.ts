@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
         { role: "system", content: systemPrompt },
         { role: "user", content: prompt },
       ],
-      params: { temperature: 0.7, top_p: 0.9, reasoning_effort: "medium" },
+      params: { temperature: 0.7, top_p: 0.9, reasoning_effort: "high" },
     });
 
     const optimizedPayload = buildChatPayload({
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
         { role: "system", content: systemPrompt },
         { role: "user", content: optimizedPrompt },
       ],
-      params: cosavuParams.model,
+      params: { ...cosavuParams.model, reasoning_effort: "high" },
     });
 
     const [direct, optimized] = await Promise.all([
